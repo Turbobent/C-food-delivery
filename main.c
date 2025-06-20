@@ -1,11 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_ITEMS 4
+#define MAX_ORDER 10
+#define MAX_STRING 100
 
 int main() {
     int menuChoice;
-    int *order;
+    int order[MAX_ORDER];
+    int orderCount = 0;
+    int itemChoice;
+    char deliveryAddress[MAX_STRING];
+    char deliveryTime[MAX_STRING];
 
     const char *mc_bruger[MAX_ITEMS] = {
         "1. Cheeseburger 26$",
@@ -28,6 +35,8 @@ int main() {
         "4. Tea 2$"
     };
 
+    const char **menu = NULL;
+
     printf("Welcome to Food Del!\n");
     printf("What restaurant do you want to order from?\n");
     printf("Available restaurants:\n");
@@ -39,25 +48,56 @@ int main() {
 
     if (menuChoice == 1) {
         printf("Menu: Mc Bruger\n");
-        for (int i = 0; i < MAX_ITEMS; i++) {
-            printf("  - %s\n", mc_bruger[i]);
-        }
+        menu = mc_bruger;
     } else if (menuChoice == 2) {
         printf("Menu: Bruger Queen\n");
-        for (int i = 0; i < MAX_ITEMS; i++) {
-            printf("  - %s\n", bruger_queen[i]);
-        }
+        menu = bruger_queen;
     } else if (menuChoice == 3) {
         printf("Menu: Lagkage Telt\n");
-        for (int i = 0; i < MAX_ITEMS; i++) {
-            printf("  - %s\n", lagkage_telt[i]);
-        }
+        menu = lagkage_telt;
     } else {
         printf("Invalid choice.\n");
+        return 1;
     }
 
-    printf("what items do you want to order:");
-    scanf("%d", &order);
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        printf("  - %s\n", menu[i]);
+    }
+
+    printf("\nEnter the number of the item to order (0 to finish):\n");
+
+    do {
+        printf("Item number: ");
+        scanf("%d", &itemChoice);
+
+        if (itemChoice > 0 && itemChoice <= MAX_ITEMS) {
+            if (orderCount < MAX_ORDER) {
+                order[orderCount++] = itemChoice;
+            } else {
+                printf("Order limit reached.\n");
+                break;
+            }
+        } else if (itemChoice != 0) {
+            printf("Invalid item number.\n");
+        }
+
+    } while (itemChoice != 0);
+
+    printf("\nYou ordered:\n");
+    for (int i = 0; i < orderCount; i++) {
+        printf("  - %s\n", menu[order[i] - 1]);
+    }
+
+    // Clear the input buffer
+    while (getchar() != '\n');
+
+    printf("\nWhat is the address you want it delivered to? ");
+    fgets(deliveryAddress, MAX_STRING, stdin);
+    deliveryAddress[strcspn(deliveryAddress, "\n")] = 0;  
+
+    printf("Estimated delivery time (e.g. 18:30): ");
+    fgets(deliveryTime, MAX_STRING, stdin);
+    deliveryTime[strcspn(deliveryTime, "\n")] = 0;
 
     return 0;
 }
